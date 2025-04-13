@@ -1,23 +1,31 @@
 import React, { useState, useEffect } from "react";
 
+// Define the Azure backend API URL - used for all fetch calls
+// Change this value when deploying to different environments
+const API_URL = "https://courses-backend-app.azurewebsites.net";
+
 const CoursesPage = ({ courses = [], setCourses }) => {
+  // State for form inputs
   const [courseName, setCourseName] = useState("");
   const [courseLink, setCourseLink] = useState("");
   const [editingCourseIndex, setEditingCourseIndex] = useState(null);
   const [assignmentInputs, setAssignmentInputs] = useState({});
 
-  // Fetch courses when the component mounts
+  // Fetch courses from the API when the component mounts
+  // This is only called once when the component is first rendered
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        console.log("Fetching courses...");
-        const response = await fetch('http://localhost:5000/courses');
+        console.log("Fetching courses from API...");
+        // Use API_URL constant instead of hardcoded localhost
+        const response = await fetch(`${API_URL}/courses`);
         if (!response.ok) {
           throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
         }
         const data = await response.json();
         console.log("Fetched courses:", data);
         
+        // Ensure assignments property is always an array
         const processedData = data.map(course => ({
           ...course,
           assignments: Array.isArray(course.assignments) ? course.assignments : []
@@ -32,6 +40,7 @@ const CoursesPage = ({ courses = [], setCourses }) => {
     fetchCourses();
   }, [setCourses]);
 
+  // Helper function to manage assignment form inputs
   const handleAssignmentInputChange = (courseId, field, value) => {
     setAssignmentInputs(prev => ({
       ...prev,
@@ -42,6 +51,7 @@ const CoursesPage = ({ courses = [], setCourses }) => {
     }));
   };
 
+  // Create a new course
   const addCourse = async () => {
     if (courseName && courseLink) {
       const newCourse = { 
@@ -51,7 +61,8 @@ const CoursesPage = ({ courses = [], setCourses }) => {
         assignments: []
       };
       try {
-        const response = await fetch('http://localhost:5000/courses', {
+        // POST request to create a new course
+        const response = await fetch(`${API_URL}/courses`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -73,15 +84,19 @@ const CoursesPage = ({ courses = [], setCourses }) => {
     }
   };
 
+  // Delete a course and its assignments
   const deleteCourse = async (index) => {
     const courseId = courses[index]?.id;
     if (courseId) {
       try {
-        const response = await fetch(`http://localhost:5000/courses/${courseId}`, {
+        // DELETE request to remove a course
+        const response = await fetch(`${API_URL}/courses/${courseId}`, {
           method: 'DELETE',
         });
         if (response.ok) {
+          // Update local state after successful deletion
           setCourses(prevCourses => prevCourses.filter(course => course.id !== courseId));
+          // Clean up assignment inputs for deleted course
           const newAssignmentInputs = { ...assignmentInputs };
           delete newAssignmentInputs[courseId];
           setAssignmentInputs(newAssignmentInputs);
@@ -94,6 +109,7 @@ const CoursesPage = ({ courses = [], setCourses }) => {
     }
   };
 
+  // Update an existing course
   const editCourse = async (index) => {
     const updatedCourse = {
       ...courses[index],
@@ -101,7 +117,8 @@ const CoursesPage = ({ courses = [], setCourses }) => {
       course_link: courseLink || courses[index].course_link,
     };
     try {
-      const response = await fetch(`http://localhost:5000/courses/${updatedCourse.id}`, {
+      // PUT request to update a course
+      const response = await fetch(`${API_URL}/courses/${updatedCourse.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -110,6 +127,7 @@ const CoursesPage = ({ courses = [], setCourses }) => {
       });
       if (response.ok) {
         const updatedCourseData = await response.json();
+        // Update local state with the response from the server
         const updatedCourses = [...courses];
         updatedCourses[index] = {
           ...updatedCourseData,
@@ -124,17 +142,20 @@ const CoursesPage = ({ courses = [], setCourses }) => {
     }
   };
 
+  // Update the study hours for a course
   const changeStudyHours = async (index, increment) => {
     const updatedCourses = [...courses];
     const updatedCourse = { ...updatedCourses[index] };
     updatedCourse.study_hours += increment;
     
+    // Ensure study hours don't go below zero
     if (updatedCourse.study_hours < 0) {
       updatedCourse.study_hours = 0;
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/courses/${updatedCourse.id}`, {
+      // PUT request to update study hours
+      const response = await fetch(`${API_URL}/courses/${updatedCourse.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -158,7 +179,7 @@ const CoursesPage = ({ courses = [], setCourses }) => {
     }
   };
 
-  // Add an assignment
+  // Add a new assignment to a course
   const addAssignment = async (courseIndex) => {
     const course = courses[courseIndex];
     const courseInputs = assignmentInputs[course.id] || {};
@@ -176,7 +197,8 @@ const CoursesPage = ({ courses = [], setCourses }) => {
       };
       
       try {
-        const response = await fetch(`http://localhost:5000/courses/${course.id}/assignments`, {
+        // POST request to create a new assignment
+        const response = await fetch(`${API_URL}/courses/${course.id}/assignments`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -186,6 +208,7 @@ const CoursesPage = ({ courses = [], setCourses }) => {
         
         if (response.ok) {
           const createdAssignment = await response.json();
+          // Update local state with the new assignment
           const updatedCourses = [...courses];
           const updatedCourse = { ...updatedCourses[courseIndex] };
           
@@ -197,6 +220,7 @@ const CoursesPage = ({ courses = [], setCourses }) => {
           updatedCourses[courseIndex] = updatedCourse;
           setCourses(updatedCourses);
           
+          // Reset form inputs after successful creation
           handleAssignmentInputChange(course.id, 'name', '');
           handleAssignmentInputChange(course.id, 'dueDate', '');
         } else {
@@ -211,19 +235,22 @@ const CoursesPage = ({ courses = [], setCourses }) => {
     }
   };
 
+  // Delete an assignment
   const deleteAssignment = async (courseIndex, assignmentIndex, event) => {
-    event.stopPropagation();
+    event.stopPropagation(); // Prevent event bubbling to parent elements
     
     const course = courses[courseIndex];
     const assignment = course.assignments[assignmentIndex];
     
     if (assignment && assignment.id) {
       try {
-        const response = await fetch(`http://localhost:5000/assignments/${assignment.id}`, {
+        // DELETE request to remove an assignment
+        const response = await fetch(`${API_URL}/assignments/${assignment.id}`, {
           method: 'DELETE',
         });
         
         if (response.ok) {
+          // Update local state after successful deletion
           const updatedCourses = [...courses];
           const updatedCourse = { ...updatedCourses[courseIndex] };
           const updatedAssignments = [...updatedCourse.assignments];
@@ -240,11 +267,13 @@ const CoursesPage = ({ courses = [], setCourses }) => {
     }
   };
 
+  // Toggle the completion status of an assignment
   const toggleAssignmentCompletion = async (courseIndex, assignmentIndex) => {
     const course = courses[courseIndex];
     const assignment = course.assignments[assignmentIndex];
     
     if (assignment) {
+      // Update local state optimistically
       const updatedCourses = [...courses];
       const updatedCourse = { ...updatedCourses[courseIndex] };
       const updatedAssignments = [...updatedCourse.assignments];
@@ -258,14 +287,20 @@ const CoursesPage = ({ courses = [], setCourses }) => {
       setCourses(updatedCourses);
       
       try {
-        await fetch(`http://localhost:5000/assignments/${assignment.id}`, {
+        // PUT request to update assignment completion status
+        await fetch(`${API_URL}/assignments/${assignment.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ is_completed: updatedAssignment.is_completed }),
         });
+        
+        // Store a timestamp in localStorage to notify other components of the update
+        // This helps with cross-component synchronization
+        localStorage.setItem('assignment_updated', Date.now().toString());
       } catch (error) {
+        // Revert the local state change if the API call fails
         console.error('Error updating assignment:', error);
         updatedAssignment.is_completed = !updatedAssignment.is_completed;
         setCourses([...updatedCourses]);
@@ -273,15 +308,18 @@ const CoursesPage = ({ courses = [], setCourses }) => {
     }
   };
 
+  // Reset form inputs for adding/editing courses
   const resetCourseInputs = () => {
     setCourseName("");
     setCourseLink("");
   };
 
+  // Render the component UI
   return (
     <div className="courses-page">
       <h1>{editingCourseIndex !== null ? "Update Course" : "Add Course"}</h1>
       
+      {/* Course form for adding/editing courses */}
       <div>
         <input
           type="text"
@@ -308,6 +346,7 @@ const CoursesPage = ({ courses = [], setCourses }) => {
         )}
       </div>
 
+      {/* Display course list */}
       {courses.length > 0 ? (
         courses.map((course, index) => (
           <div key={course.id || index} className="course" style={{ 
@@ -319,6 +358,7 @@ const CoursesPage = ({ courses = [], setCourses }) => {
             <h3>{course.name}</h3>
             <p>Link: <a href={course.course_link} target="_blank" rel="noopener noreferrer">{course.course_link}</a></p>
 
+            {/* Course actions */}
             <div style={{ marginBottom: "10px" }}>
               <button 
                 onClick={() => { 
@@ -333,12 +373,14 @@ const CoursesPage = ({ courses = [], setCourses }) => {
               <button onClick={() => deleteCourse(index)}>Delete</button>
             </div>
 
+            {/* Study hours control */}
             <div style={{ margin: "15px 0" }}>
               <p>Total Study Hours: {course.study_hours || 0}</p>
               <button onClick={() => changeStudyHours(index, 0.5)} style={{ marginRight: "5px" }}>+</button>
               <button onClick={() => changeStudyHours(index, -0.5)}>-</button>
             </div>
 
+            {/* Assignment form */}
             <div style={{ 
               margin: "15px 0", 
               padding: "10px", 
@@ -362,6 +404,7 @@ const CoursesPage = ({ courses = [], setCourses }) => {
               <button onClick={() => addAssignment(index)}>Add Assignment</button>
             </div>
 
+            {/* Assignment list */}
             <div className="assignments-list">
               <h4>Assignments:</h4>
               {Array.isArray(course.assignments) && course.assignments.length > 0 ? (
@@ -385,6 +428,7 @@ const CoursesPage = ({ courses = [], setCourses }) => {
                           alignItems: "center"
                         }}
                       >
+                        {/* Assignment information and checkbox */}
                         <div onClick={() => toggleAssignmentCompletion(index, idx)} style={{ cursor: "pointer", flex: 1 }}>
                           <input 
                             type="checkbox" 
@@ -397,6 +441,7 @@ const CoursesPage = ({ courses = [], setCourses }) => {
                             Due: {new Date(assignment.due_date).toLocaleDateString()}
                           </span>
                         </div>
+                        {/* Delete assignment button */}
                         <button 
                           className="delete-assignment-btn"
                           onClick={(e) => deleteAssignment(index, idx, e)}
