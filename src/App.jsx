@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react
 import './App.css';
 import CoursesPage from './components/CoursesPage';
 import CalendarPage from './components/CalendarPage';
-import SideBar from './components/SideBar';
+import SideBar from './components/Sidebar';
 
 // Define the API URL for Azure
 const API_URL = "https://courses-backend-app.azurewebsites.net";
