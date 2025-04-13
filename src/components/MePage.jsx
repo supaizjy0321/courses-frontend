@@ -11,8 +11,8 @@ const MePage = () => {
         Your browser does not support the video tag.
       </video>
       <div className="content">
-        <h1>Your Profile</h1>
-        <p>This page shows your profile details.</p>
+        <h1>Jingya Zhao</h1>
+        <p>This website is for tracking self-learning.</p>
       </div>
     </div>
   );
