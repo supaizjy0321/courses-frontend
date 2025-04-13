@@ -6,6 +6,9 @@ import './CalendarPage.css';
 import RainbowIcon from '../assets/rainbow.svg';
 import SunIcon from '../assets/sun.svg';
 
+// Add API URL constant
+const API_URL = "https://courses-backend-app.azurewebsites.net";
+
 const CalendarPage = ({ courses = [] }) => {
   const [date, setDate] = useState(new Date());
   const [assignments, setAssignments] = useState([]);
@@ -70,7 +73,7 @@ const CalendarPage = ({ courses = [] }) => {
   // Function to fetch latest data
   const fetchLatestData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/courses');
+      const response = await fetch(`${API_URL}/courses`);
       if (!response.ok) {
         throw new Error('Failed to fetch courses');
       }
