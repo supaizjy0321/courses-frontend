@@ -1,0 +1,56 @@
+/* src/components/Sidebar.css */
+
+/* General sidebar styling */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100px;
+  background-color: #333;
+  color: white;
+  transition: transform 0.3s ease-in-out;
+  padding: 10px;
+  z-index: 10; /* Ensure sidebar is above other content */
+}
+
+/* Make the sidebar hidden when 'closed' */
+.sidebar.closed {
+  transform: translateX(-100%);
+}
+
+/* Sidebar toggle button */
+.toggle-btn {
+  position: absolute;
+  top: 10px;
+  right: -60px;
+  padding: 10px;
+  background-color: #444;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.sidebar-nav {
+  margin-top: 40px;
+}
+
+.sidebar-nav ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.sidebar-nav li {
+  margin: 20px 0;
+}
+
+.sidebar-nav a {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.sidebar-nav a:hover {
+  color: #ff9900;
+}
+

@@ -1,0 +1,29 @@
+/* src/components/MePage.css */
+.me-page {
+    position: absolute; /* Change to absolute positioning */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden; /* Hide overflow to prevent scrollbars */
+    margin: 0; /* Remove any default margin */
+    padding: 0; /* Remove any default padding */
+}
+
+.background-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Cover the entire area */
+    z-index: -1; /* Send the video behind other content */
+}
+
+.content {
+    position: relative; /* Position relative for content to be above the video */
+    z-index: 1; /* Ensure content is above the video */
+    color: white; /* Change text color for visibility */
+    text-align: center; /* Center the text */
+    padding: 20px; /* Add some padding */
+}

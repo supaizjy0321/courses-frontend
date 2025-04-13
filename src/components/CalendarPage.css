@@ -1,0 +1,215 @@
+/* src/components/CalendarPage.css */
+.calendar-page {
+    padding: 20px;
+    font-family: 'Comic Sans MS', cursive, sans-serif; /* Fun font */
+}
+
+.calendar-container {
+    margin-bottom: 20px;
+    max-width: 800px;
+}
+
+/* Make sure all text in calendar is visible */
+.react-calendar {
+    color: #333; /* Force dark text color for all calendar text */
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+/* Style for the month name */
+.react-calendar__month-view__header {
+    font-family: 'Comic Sans MS', cursive, sans-serif; /* Fun font for month names */
+    font-size: 1.5rem; /* Adjust size as needed */
+    color: #ff6b6b; /* Cute color for month names */
+}
+
+/* Style for day names (MON, TUE, etc.) */
+.react-calendar__month-view__weekdays {
+    font-family: 'Comic Sans MS', cursive, sans-serif; /* Fun font for day names */
+    font-size: 1rem; /* Adjust size as needed */
+    color: #4CAF50 !important; /* Cute color for day names */
+}
+
+.react-calendar__month-view__weekdays__weekday {
+    text-decoration: none;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Style for normal day numbers */
+.react-calendar__tile {
+    height: 40px; /* Set a fixed height */
+    padding: 8px;
+    position: relative;
+    border-radius: 10px; /* Rounded corners for a cute look */
+    transition: transform 0.2s; /* Smooth scaling effect */
+    color: #333; /* Dark color for day numbers */
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-size: 1.2rem;
+}
+
+/* Style for weekend numbers */
+.react-calendar__month-view__days__day--weekend {
+    color: #d10000; /* Red color for weekends */
+}
+
+/* Style for days from other months */
+.react-calendar__month-view__days__day--neighboringMonth {
+    color: #757575 !important; /* Light gray for days from other months */
+}
+
+/* Style for month and year navigation */
+.react-calendar__navigation button {
+    color: #333;
+    font-weight: bold;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+/* Style for dates with assignments */
+.assignment-day {
+    background-color: rgba(0, 128, 0, 0.2) !important;
+    border-radius: 0;
+    color: black !important; /* Force black text for assignment days */
+    font-weight: bold;
+    font-size: 1.2rem; /* Slightly larger font size */
+    border: 2px dashed #4CAF50; /* Cute dashed border */
+}
+
+/* Style for dates with completed assignments */
+.completed-assignment-day {
+    background-color: #F7CFD8 !important;
+    border-radius: 0;
+    color: black !important; /* Force black text for completed days */
+    font-size: 1.2rem; /* Slightly larger font size */
+    border: 2px dashed #FF6B6B; /* Cute dashed border */
+}
+
+/* Assignment indicator dot */
+.assignment-indicator {
+    width: 8px;
+    height: 8px;
+    background-color: #015551;
+    border-radius: 50%;
+    margin: 2px auto 0;
+}
+
+/* Tile icon for completed assignments */
+.tile-icon {
+    width: 16px;
+    height: 16px;
+    margin: 2px auto 0;
+}
+
+/* Today's date styling */
+.today-tile {
+    position: relative;
+    background: transparent !important;
+}
+
+.today-tile abbr {
+    /* Hide the date number */
+    visibility: hidden;
+}
+
+.today-icon-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.today-icon {
+    width: 24px; /* Adjust size as needed */
+    height: 24px; /* Adjust size as needed */
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* Override default react-calendar today's date styling */
+.react-calendar__tile--now {
+    background: transparent !important;
+}
+
+.react-calendar__tile--now:enabled:hover,
+.react-calendar__tile--now:enabled:focus {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Add hover effect for tiles */
+.react-calendar__tile:hover {
+    transform: scale(1.05); /* Slightly enlarge on hover */
+    background-color: rgba(255, 223, 186, 0.5); /* Light background on hover */
+}
+
+/* Rainbow icon in assignment list */
+.rainbow-icon {
+    width: 20px;
+    height: 20px;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+/* Assignment list styling */
+.assignments-panel {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+}
+
+.assignment-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.assignment-list li {
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+}
+
+.pending-assignment {
+    background-color: rgba(0, 128, 0, 0.1);
+    border-left: 4px solid green;
+}
+
+.completed-assignment {
+    background-color: #F7CFD8;
+    border-left: 4px solid #F7CFD8;
+}
+
+.refresh-button {
+    margin-bottom: 15px;
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.refresh-button:hover {
+    background-color: #45a049;
+}
+
+.debug-info {
+    background-color: #f0f0f0;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.assignment-debug {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}

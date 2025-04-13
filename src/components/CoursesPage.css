@@ -1,0 +1,73 @@
+/* src/components/CoursesPage.css */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.courses-page {
+  position: absolute; /* Change to absolute positioning */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: 100vh; /* Full viewport height */
+  width: 100vw; /* Full viewport width */
+  margin: 0; /* Remove any margin */
+  padding: 20px; /* Keep padding for content */
+  box-sizing: border-box; /* Include padding in width/height calculation */
+  background-image: url('../assets/color.jpg'); /* Background image */
+  background-size: cover; /* Cover the entire area */
+  background-position: center; /* Center the background image */
+  background-repeat: no-repeat; /* Prevent repeating */
+  overflow-y: auto; /* Allow scrolling for content */
+  z-index: 0; /* Set a base z-index */
+}
+
+.course {
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: rgba(240, 240, 240, 0.8); /* Semi-transparent background for course cards */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+  position: relative; /* Ensure it's above the background */
+  z-index: 1; /* Higher than the background */
+}
+
+.assignment {
+  margin: 10px 0;
+}
+
+button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+  border: none;
+  background-color: #007bff; /* Button color */
+  color: white;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+}
+
+/* Style for the form at the top */
+.courses-page h1,
+.courses-page > div:first-of-type {
+  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Make inputs more visible against the background */
+input {
+  padding: 8px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
