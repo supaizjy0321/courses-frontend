@@ -1,76 +1,74 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import Sidebar from './components/Sidebar';
+import HomePage from './components/HomePage';
 import CoursesPage from './components/CoursesPage';
 import CalendarPage from './components/CalendarPage';
-import SideBar from './components/Sidebar';
+import MePage from './components/MePage';
+import './index.css';
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // Define the API URL for Azure
 const API_URL = "https://courses-backend-app.azurewebsites.net";
 
-// Main App component
-function App() {
-  // AppContent component handles the actual content and responds to route changes
-  return (
-    <Router>
-      <AppContent />
-    </Router>
-  );
-}
-
-// Separate component to use useLocation hook (which must be inside Router)
-function AppContent() {
+// Create a wrapper component to handle route changes
+const AppContent = () => {
   const [courses, setCourses] = useState([]);
   const location = useLocation();
-
-  // Fetch courses on initial load and when navigating to different routes
-  useEffect(() => {
-    fetchCourses();
-  }, [location.pathname]); // Re-fetch when the route changes
-
-  // Function to fetch courses from the backend
+  
+  // Function to fetch courses data
   const fetchCourses = async () => {
     try {
-      console.log("Fetching courses from API...");
+      // Use the API_URL instead of localhost
       const response = await fetch(`${API_URL}/courses`);
-      
       if (!response.ok) {
-        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+        throw new Error(`Network response was not ok: ${response.status}`);
       }
-      
       const data = await response.json();
-      console.log("Courses fetched successfully:", data);
-      
-      // Process courses data to ensure assignments is always an array
-      const processedData = data.map(course => ({
-        ...course,
-        assignments: Array.isArray(course.assignments) ? course.assignments : []
-      }));
-      
-      setCourses(processedData);
+      console.log("Courses fetched in App.js:", data);
+      setCourses(data);
     } catch (error) {
-      console.error('Error fetching courses:', error);
+      console.error('Error fetching courses in App.js:', error);
     }
   };
 
+  // Fetch courses when the app loads
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+  
+  // Re-fetch courses when navigating to the calendar page
+  useEffect(() => {
+    if (location.pathname === '/calendar') {
+      console.log('Navigated to calendar, refreshing courses data');
+      fetchCourses();
+    }
+  }, [location.pathname]);
+
   return (
     <div className="app">
-      <SideBar />
-      
-      <main className="main-content">
+      <Sidebar />
+      <div className="main-content">
         <Routes>
-          <Route 
-            path="/" 
-            element={<CoursesPage courses={courses} setCourses={setCourses} />} 
-          />
-          <Route 
-            path="/calendar" 
-            element={<CalendarPage courses={courses} />} 
-          />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/courses" element={<CoursesPage courses={courses} setCourses={setCourses} />} />
+          <Route path="/calendar" element={<CalendarPage courses={courses} />} />
+          <Route path="/me" element={<MePage />} />
         </Routes>
-      </main>
+      </div>
     </div>
   );
-}
+};
+
+// Main App component with Router
+const App = () => {
+  return (
+    <Router>
+      <ErrorBoundary>
+        <AppContent />
+      </ErrorBoundary>
+    </Router>
+  );
+};
 
 export default App;
