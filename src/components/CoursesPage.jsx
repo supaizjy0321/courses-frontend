@@ -10,6 +10,8 @@ const CoursesPage = ({ courses = [], setCourses }) => {
   const [courseLink, setCourseLink] = useState("");
   const [editingCourseIndex, setEditingCourseIndex] = useState(null);
   const [assignmentInputs, setAssignmentInputs] = useState({});
+  // Add state to track minimized courses
+  const [minimizedCourses, setMinimizedCourses] = useState({});
 
   // Fetch courses from the API when the component mounts
   // This is only called once when the component is first rendered
@@ -100,6 +102,10 @@ const CoursesPage = ({ courses = [], setCourses }) => {
           const newAssignmentInputs = { ...assignmentInputs };
           delete newAssignmentInputs[courseId];
           setAssignmentInputs(newAssignmentInputs);
+          // Remove from minimized courses if present
+          const newMinimizedCourses = { ...minimizedCourses };
+          delete newMinimizedCourses[courseId];
+          setMinimizedCourses(newMinimizedCourses);
         } else {
           console.error('Error deleting course:', await response.text());
         }
@@ -314,6 +320,14 @@ const CoursesPage = ({ courses = [], setCourses }) => {
     setCourseLink("");
   };
 
+  // Toggle course card minimized state
+  const toggleCourseMinimized = (courseId) => {
+    setMinimizedCourses(prev => ({
+      ...prev,
+      [courseId]: !prev[courseId]
+    }));
+  };
+
   // Render the component UI
   return (
     <div className="courses-page">
@@ -355,116 +369,143 @@ const CoursesPage = ({ courses = [], setCourses }) => {
             border: "1px solid #e0e0e0", 
             borderRadius: "8px" 
           }}>
-            <h3>{course.name}</h3>
-            <p>Link: <a href={course.course_link} target="_blank" rel="noopener noreferrer">{course.course_link}</a></p>
-
-            {/* Course actions */}
-            <div style={{ marginBottom: "10px" }}>
-              <button 
-                onClick={() => { 
-                  setEditingCourseIndex(index); 
-                  setCourseName(course.name); 
-                  setCourseLink(course.course_link); 
-                }}
-                style={{ marginRight: "10px" }}
-              >
-                Edit
-              </button>
-              <button onClick={() => deleteCourse(index)}>Delete</button>
-            </div>
-
-            {/* Study hours control */}
-            <div style={{ margin: "15px 0" }}>
-              <p>Total Study Hours: {course.study_hours || 0}</p>
-              <button onClick={() => changeStudyHours(index, 0.5)} style={{ marginRight: "5px" }}>+</button>
-              <button onClick={() => changeStudyHours(index, -0.5)}>-</button>
-            </div>
-
-            {/* Assignment form */}
             <div style={{ 
-              margin: "15px 0", 
-              padding: "10px", 
-              backgroundColor: "#f5f5f5", 
-              borderRadius: "5px" 
+              display: "flex", 
+              justifyContent: "space-between", 
+              alignItems: "center",
+              marginBottom: "10px"
             }}>
-              <h4>Add New Assignment</h4>
-              <input
-                type="text"
-                placeholder="Assignment Name"
-                value={(assignmentInputs[course.id] || {}).name || ''}
-                onChange={(e) => handleAssignmentInputChange(course.id, 'name', e.target.value)}
-                style={{ marginRight: "10px", padding: "5px" }}
-              />
-              <input
-                type="date"
-                value={(assignmentInputs[course.id] || {}).dueDate || ''}
-                onChange={(e) => handleAssignmentInputChange(course.id, 'dueDate', e.target.value)}
-                style={{ marginRight: "10px", padding: "5px" }}
-              />
-              <button onClick={() => addAssignment(index)}>Add Assignment</button>
+              <h3>{course.name}</h3>
+              {/* Minimize/Expand button */}
+              <button 
+                onClick={() => toggleCourseMinimized(course.id)}
+                style={{
+                  background: "none",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  padding: "5px 10px",
+                  cursor: "pointer",
+                  fontSize: "12px"
+                }}
+              >
+                {minimizedCourses[course.id] ? "Expand" : "Minimize"}
+              </button>
             </div>
 
-            {/* Assignment list */}
-            <div className="assignments-list">
-              <h4>Assignments:</h4>
-              {Array.isArray(course.assignments) && course.assignments.length > 0 ? (
-                course.assignments.map((assignment, idx) => (
-                  assignment && (
-                    <div key={`assignment-${assignment.id || idx}`} className="assignment" style={{
-                      backgroundColor: assignment.is_completed ? "#f0f8ff" : "#fff",
-                      borderLeft: assignment.is_completed ? "3px solid #4CAF50" : "3px solid #f44336",
-                      marginBottom: "8px"
-                    }}>
-                      <div 
-                        className="assignment-content"
-                        style={{ 
-                          textDecoration: assignment.is_completed ? "line-through" : "none",
-                          padding: "8px",
-                          margin: "5px 0",
-                          border: "1px solid #ddd",
-                          borderRadius: "4px",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center"
-                        }}
-                      >
-                        {/* Assignment information and checkbox */}
-                        <div onClick={() => toggleAssignmentCompletion(index, idx)} style={{ cursor: "pointer", flex: 1 }}>
-                          <input 
-                            type="checkbox" 
-                            checked={assignment.is_completed} 
-                            onChange={() => toggleAssignmentCompletion(index, idx)}
-                            style={{ marginRight: "8px" }}
-                          />
-                          <span style={{ fontWeight: "bold" }}>{assignment.name}</span>
-                          <span style={{ marginLeft: "10px", color: "#666" }}>
-                            Due: {new Date(assignment.due_date).toLocaleDateString()}
-                          </span>
+            {/* Course details - only show if not minimized */}
+            {!minimizedCourses[course.id] && (
+              <>
+                <p>Link: <a href={course.course_link} target="_blank" rel="noopener noreferrer">{course.course_link}</a></p>
+
+                {/* Course actions */}
+                <div style={{ marginBottom: "10px" }}>
+                  <button 
+                    onClick={() => { 
+                      setEditingCourseIndex(index); 
+                      setCourseName(course.name); 
+                      setCourseLink(course.course_link); 
+                    }}
+                    style={{ marginRight: "10px" }}
+                  >
+                    Edit
+                  </button>
+                  <button onClick={() => deleteCourse(index)}>Delete</button>
+                </div>
+
+                {/* Study hours control */}
+                <div style={{ margin: "15px 0" }}>
+                  <p>Total Study Hours: {course.study_hours || 0}</p>
+                  <button onClick={() => changeStudyHours(index, 0.5)} style={{ marginRight: "5px" }}>+</button>
+                  <button onClick={() => changeStudyHours(index, -0.5)}>-</button>
+                </div>
+
+                {/* Assignment form */}
+                <div style={{ 
+                  margin: "15px 0", 
+                  padding: "10px", 
+                  backgroundColor: "#f5f5f5", 
+                  borderRadius: "5px" 
+                }}>
+                  <h4>Add New Assignment</h4>
+                  <input
+                    type="text"
+                    placeholder="Assignment Name"
+                    value={(assignmentInputs[course.id] || {}).name || ''}
+                    onChange={(e) => handleAssignmentInputChange(course.id, 'name', e.target.value)}
+                    style={{ marginRight: "10px", padding: "5px" }}
+                  />
+                  <input
+                    type="date"
+                    value={(assignmentInputs[course.id] || {}).dueDate || ''}
+                    onChange={(e) => handleAssignmentInputChange(course.id, 'dueDate', e.target.value)}
+                    style={{ marginRight: "10px", padding: "5px" }}
+                  />
+                  <button onClick={() => addAssignment(index)}>Add Assignment</button>
+                </div>
+
+                {/* Assignment list */}
+                <div className="assignments-list">
+                  <h4>Assignments:</h4>
+                  {Array.isArray(course.assignments) && course.assignments.length > 0 ? (
+                    course.assignments.map((assignment, idx) => (
+                      assignment && (
+                        <div key={`assignment-${assignment.id || idx}`} className="assignment" style={{
+                          backgroundColor: assignment.is_completed ? "#f0f8ff" : "#fff",
+                          borderLeft: assignment.is_completed ? "3px solid #4CAF50" : "3px solid #f44336",
+                          marginBottom: "8px"
+                        }}>
+                          <div 
+                            className="assignment-content"
+                            style={{ 
+                              textDecoration: assignment.is_completed ? "line-through" : "none",
+                              padding: "8px",
+                              margin: "5px 0",
+                              border: "1px solid #ddd",
+                              borderRadius: "4px",
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center"
+                            }}
+                          >
+                            {/* Assignment information and checkbox */}
+                            <div onClick={() => toggleAssignmentCompletion(index, idx)} style={{ cursor: "pointer", flex: 1 }}>
+                              <input 
+                                type="checkbox" 
+                                checked={assignment.is_completed} 
+                                onChange={() => toggleAssignmentCompletion(index, idx)}
+                                style={{ marginRight: "8px" }}
+                              />
+                              <span style={{ fontWeight: "bold" }}>{assignment.name}</span>
+                              <span style={{ marginLeft: "10px", color: "#666" }}>
+                                Due: {new Date(assignment.due_date).toLocaleDateString()}
+                              </span>
+                            </div>
+                            {/* Delete assignment button */}
+                            <button 
+                              className="delete-assignment-btn"
+                              onClick={(e) => deleteAssignment(index, idx, e)}
+                              style={{ 
+                                marginLeft: "10px", 
+                                background: "#ff6b6b", 
+                                color: "white", 
+                                border: "none",
+                                borderRadius: "4px",
+                                padding: "5px 10px",
+                                cursor: "pointer"
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </div>
                         </div>
-                        {/* Delete assignment button */}
-                        <button 
-                          className="delete-assignment-btn"
-                          onClick={(e) => deleteAssignment(index, idx, e)}
-                          style={{ 
-                            marginLeft: "10px", 
-                            background: "#ff6b6b", 
-                            color: "white", 
-                            border: "none",
-                            borderRadius: "4px",
-                            padding: "5px 10px",
-                            cursor: "pointer"
-                          }}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  )
-                ))
-              ) : (
-                <p>No assignments yet.</p>
-              )}
-            </div>
+                      )
+                    ))
+                  ) : (
+                    <p>No assignments yet.</p>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         ))
       ) : (
