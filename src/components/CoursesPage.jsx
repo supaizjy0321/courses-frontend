@@ -4,6 +4,14 @@ import React, { useState, useEffect } from "react";
 // Change this value when deploying to different environments
 const API_URL = "https://courses-backend-app.azurewebsites.net";
 
+// Helper function to ensure URLs have proper format
+const formatUrl = (url) => {
+  if (url && !url.match(/^https?:\/\//i)) {
+    return `https://${url}`;
+  }
+  return url;
+};
+
 const CoursesPage = ({ courses = [], setCourses }) => {
   // State for form inputs
   const [courseName, setCourseName] = useState("");
@@ -56,9 +64,10 @@ const CoursesPage = ({ courses = [], setCourses }) => {
   // Create a new course
   const addCourse = async () => {
     if (courseName && courseLink) {
+      const formattedLink = formatUrl(courseLink);
       const newCourse = { 
         name: courseName, 
-        course_link: courseLink, 
+        course_link: formattedLink, 
         study_hours: 0,
         assignments: []
       };
@@ -117,10 +126,11 @@ const CoursesPage = ({ courses = [], setCourses }) => {
 
   // Update an existing course
   const editCourse = async (index) => {
+    const formattedLink = formatUrl(courseLink || courses[index].course_link);
     const updatedCourse = {
       ...courses[index],
       name: courseName || courses[index].name,
-      course_link: courseLink || courses[index].course_link,
+      course_link: formattedLink,
     };
     try {
       // PUT request to update a course
@@ -395,7 +405,7 @@ const CoursesPage = ({ courses = [], setCourses }) => {
             {/* Course details - only show if not minimized */}
             {!minimizedCourses[course.id] && (
               <>
-                <p>Link: <a href={course.course_link} target="_blank" rel="noopener noreferrer">{course.course_link}</a></p>
+                <p>Link: <a href={formatUrl(course.course_link)} target="_blank" rel="noopener noreferrer">{course.course_link}</a></p>
 
                 {/* Course actions */}
                 <div style={{ marginBottom: "10px" }}>
