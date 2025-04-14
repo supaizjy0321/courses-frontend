@@ -71,3 +71,26 @@ input {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+
+/* Course card header with minimize/expand button */
+.course-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* Minimize/Expand button styling */
+.minimize-button {
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.minimize-button:hover {
+  background-color: #f0f0f0;
+}
