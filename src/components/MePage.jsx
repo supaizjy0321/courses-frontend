@@ -12,7 +12,9 @@ const MePage = () => {
       </video>
       <div className="content">
         <h1>Jingya Zhao</h1>
-        <p>This website is for tracking self-learning.</p>
+        <p>I am a third-year student at Centria UAS, specializing in Information Technology.</p>
+        <p>This is my first full-stack website, designed to help users manage their learning activities effectively.</p>
+        <p>I aim to continuously improve this application by adding new features and enhancing the user experience based on feedback.</p>
       </div>
     </div>
   );
